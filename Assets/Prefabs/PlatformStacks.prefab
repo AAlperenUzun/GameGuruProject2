@@ -46,11 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c83946a2f47f7ac42a62a3a557099666, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  platformPrefab: {fileID: 2167043606787182260, guid: 9e021b53043feb44aa3b76bc6dabb82a,
-    type: 3}
   moveSpeed: 5
   moveLimit: 5
-  oldPlatform: {fileID: 3223054982309079627}
+  oldPlatform: {fileID: 6067223088969358930}
   minimumPositionDifference: 0.2
   goalPlatformCount: 10
   finishPrefab: {fileID: 8822058165888743613, guid: 50d59dd24e8b8264b890d8c1d9709931,
@@ -160,12 +158,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e021b53043feb44aa3b76bc6dabb82a, type: 3}
---- !u!1 &3223054982309079627 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2167043606787182260, guid: 9e021b53043feb44aa3b76bc6dabb82a,
-    type: 3}
-  m_PrefabInstance: {fileID: 3650296982041339135}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6067223088969358930 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7393624722787809965, guid: 9e021b53043feb44aa3b76bc6dabb82a,
