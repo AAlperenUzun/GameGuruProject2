@@ -7,6 +7,7 @@ using Vector3 = UnityEngine.Vector3;
         {
             void AdjustPlatformSizeAndPosition();
             void CreateFinish();
+            void Init();
             event Action<Vector3> OnTargetPositionChanged;
         }
     }

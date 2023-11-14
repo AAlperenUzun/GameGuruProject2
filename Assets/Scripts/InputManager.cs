@@ -33,9 +33,4 @@ public class InputManager : MonoBehaviour {
     private void HandleFingerUpdate(LeanFinger finger) {
         OnTouchMoved?.Invoke(finger.ScreenPosition);
     }
-
-    public void CheckInput()
-    {
-        throw new System.NotImplementedException();
-    }
 }

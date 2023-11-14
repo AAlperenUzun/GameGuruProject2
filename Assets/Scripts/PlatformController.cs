@@ -19,24 +19,34 @@ public class PlatformController : MonoBehaviour, IPlatformController
     private bool _movingRight = true;
     private float _platformScaleZ;
     private int _currentPlatformCount = 0;
-    
+    private bool _isMove;
     [Inject] private SoundManager _soundManager;
     [Inject] private ParticleManager _particleManager;
     [Inject] private GameManager _gameManager;
     [Inject] private PlatformFactory _platformFactory;
-    
+    private List<GameObject> _createdPlatforms=new List<GameObject>();
+    private Transform _startPlatform;
+
     public event Action<Vector3> OnTargetPositionChanged;
 
     void Start()
     {
+        _startPlatform = oldPlatform;
         _platformScaleZ = oldPlatform.transform.localScale.z;
+        SetupInitialPlatform();
+        CreateFinish();
+    }
+
+    public void Init()
+    {
+        _currentPlatformCount = 0;
         SetupInitialPlatform();
         CreateFinish();
     }
 
     void Update()
     {
-        if (_currentPlatform)
+        if (_isMove)
             MovePlatform();
     }
 
@@ -53,9 +63,17 @@ public class PlatformController : MonoBehaviour, IPlatformController
 
     private void SetupInitialPlatform()
     {
-        _currentPlatform = oldPlatform;
-        OnTargetPositionChanged?.Invoke(_currentPlatform.transform.position);
+        if (!_currentPlatform)
+        {
+            _currentPlatform = oldPlatform;
+        }
+        if(!oldPlatform)
+        {
+            oldPlatform = _startPlatform;
+        }
         CreateNewPlatform();
+        OnTargetPositionChanged?.Invoke(oldPlatform.transform.position);
+        _isMove = true;
     }
 
     public void CreateFinish()
@@ -64,8 +82,21 @@ public class PlatformController : MonoBehaviour, IPlatformController
         Instantiate(finishPrefab, _finishPos, Quaternion.identity, transform);
     }
 
+    private void ResetPlatforms()
+    {
+        for (int i = _createdPlatforms.Count; i > 0; i--)
+        {
+            var platform = _createdPlatforms[i - 1];
+            _createdPlatforms.Remove(platform);
+            Destroy(platform);
+        }
+        _currentPlatform=null;
+        _isMove = false;
+    }
+
     public void AdjustPlatformSizeAndPosition()
     {
+        if (!_currentPlatform || !_isMove)return;
         float cutSize = Mathf.Abs(_currentPlatform.transform.position.x - oldPlatform.transform.position.x);
         
         if (cutSize <= minimumPositionDifference)
@@ -73,6 +104,7 @@ public class PlatformController : MonoBehaviour, IPlatformController
         else if (cutSize >= _currentPlatform.transform.localScale.x)
         {
             _currentPlatform.gameObject.AddComponent<Rigidbody>();
+            ResetPlatforms();
             _gameManager.EndGame(false, 0f);
             return;
         }
@@ -128,19 +160,24 @@ public class PlatformController : MonoBehaviour, IPlatformController
 
     private void CreateNewPlatform()
     {
+        Vector3 newPos = oldPlatform.transform.position + Vector3.forward * _platformScaleZ + (_movingRight ? Vector3.right : Vector3.left) * moveLimit;
+        
+        _currentPlatform = _platformFactory.CreatePlatform(newPos, Quaternion.identity, transform);
+
+       
+        _createdPlatforms.Add(_currentPlatform.gameObject);
+        ApplyNextMaterial();
+
         if (++_currentPlatformCount >= goalPlatformCount)
         {
-            _currentPlatform = null;
+            newPos.x = _finishPos.x;
+            _currentPlatform.position = newPos;
+            _isMove = false;
             OnTargetPositionChanged?.Invoke(_finishPos);
             _gameManager.EndGame(true, 1.5f);
             return;
         }
-
-        Vector3 newPos = oldPlatform.transform.position + Vector3.forward * _platformScaleZ + (_movingRight ? Vector3.right : Vector3.left) * moveLimit;
-        _currentPlatform = _platformFactory.CreatePlatform(newPos, Quaternion.identity, transform);
-
-        ApplyNextMaterial();
-
+        
         _currentPlatform.transform.localScale = oldPlatform.transform.localScale;
     }
 

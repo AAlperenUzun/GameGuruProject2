@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Interface;
 using UnityEngine;
 using Zenject;
 
@@ -8,6 +9,7 @@ public class GameManager : MonoBehaviour {
     [Inject]private ICharacterController _characterController;
     [Inject]private CameraController _cameraController;
     [Inject] private UIManager _uiManager;
+    [Inject] private IPlatformController _platformController;
 
     public void EndGame(bool success, float delay)
     {
@@ -18,12 +20,20 @@ public class GameManager : MonoBehaviour {
     {
         yield return new WaitForSeconds(delay);
         if (success) {
-            // Handle game win logic
             _characterController.Win();
             _cameraController.StartWinCameraMovement();
+            _uiManager.Win();
         } else {
-            // Handle game over logic
+            _characterController.Lose();
+            _platformController.Init();
+            _characterController.Reset();
         }
+    }
+    public void Next()
+    {
+        _platformController.Init();
+        _characterController.Reset();
+        _cameraController.ResetCameraMovement();
     }
 
     public void IncreaseScore(int increment) {

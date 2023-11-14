@@ -6,6 +6,8 @@ public class CharacterController : MonoBehaviour, ICharacterController {
     private Vector3 _targetPosition;
     public float moveSpeed = 2f;
     private AnimationController _animationController;
+    private Vector3 startPos;
+    
     private void OnEnable()
     {
         FindObjectOfType<PlatformController>().OnTargetPositionChanged += SetTargetPosition;
@@ -19,6 +21,7 @@ public class CharacterController : MonoBehaviour, ICharacterController {
     private void Start()
     {
         _animationController = GetComponent<AnimationController>();
+        startPos = transform.position;
     }
 
     void Update() 
@@ -34,6 +37,16 @@ public class CharacterController : MonoBehaviour, ICharacterController {
     public void Win()
     {
         _animationController.PlayAnimation("dance");
+    }
+
+    public void Lose()
+    {
+        transform.position = startPos;
+    }
+
+    public void Reset()
+    {
+        _animationController.PlayAnimation("Run");
     }
 
     public Transform GetTransform()
